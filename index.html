@@ -1,0 +1,485 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0f172a" />
+  <title>Glassmorphism Task Tracker</title>
+  <style>
+    :root {
+      --bg1: #0f172a;
+      --bg2: #111827;
+      --accent: #7c3aed;
+      --accent-2: #22c55e;
+      --danger: #ef4444;
+      --text: #e5e7eb;
+      --muted: #94a3b8;
+      --glass: rgba(255, 255, 255, 0.10);
+      --glass-strong: rgba(255, 255, 255, 0.16);
+      --border: rgba(255, 255, 255, 0.18);
+      --shadow: 0 18px 60px rgba(0, 0, 0, 0.35);
+      --radius: 24px;
+    }* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: var(--text);
+  background:
+    radial-gradient(circle at top left, rgba(124, 58, 237, 0.45), transparent 35%),
+    radial-gradient(circle at top right, rgba(34, 197, 94, 0.30), transparent 28%),
+    radial-gradient(circle at bottom left, rgba(59, 130, 246, 0.25), transparent 28%),
+    linear-gradient(160deg, var(--bg1), var(--bg2));
+  overflow-x: hidden;
+}
+
+.bg-orb {
+  position: fixed;
+  inset: auto;
+  border-radius: 50%;
+  filter: blur(40px);
+  opacity: 0.45;
+  pointer-events: none;
+  z-index: 0;
+  animation: float 10s ease-in-out infinite;
+}
+.orb-1 { width: 180px; height: 180px; background: rgba(124, 58, 237, 0.35); top: 5%; left: 8%; }
+.orb-2 { width: 140px; height: 140px; background: rgba(34, 197, 94, 0.28); top: 12%; right: 7%; animation-delay: 1.5s; }
+.orb-3 { width: 220px; height: 220px; background: rgba(59, 130, 246, 0.22); bottom: 5%; right: 12%; animation-delay: 3s; }
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px) translateX(0px); }
+  50% { transform: translateY(-18px) translateX(10px); }
+}
+
+.app {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.shell {
+  width: min(100%, 980px);
+  background: var(--glass);
+  border: 1px solid var(--border);
+  border-radius: 32px;
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  overflow: hidden;
+}
+
+.hero {
+  padding: 28px 28px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(135deg, rgba(255,255,255,0.10), rgba(255,255,255,0.04));
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.10);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-size: 0.9rem;
+  letter-spacing: 0.2px;
+}
+
+h1 {
+  margin: 16px 0 8px;
+  font-size: clamp(2rem, 4vw, 3.3rem);
+  line-height: 1.05;
+}
+
+.subtitle {
+  margin: 0;
+  color: var(--muted);
+  font-size: 1rem;
+  max-width: 58ch;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  padding: 0 28px 24px;
+  margin-top: 18px;
+}
+
+.stat {
+  background: var(--glass-strong);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 20px;
+  padding: 16px;
+}
+
+.stat .label { color: var(--muted); font-size: 0.9rem; }
+.stat .value { font-size: 1.7rem; font-weight: 700; margin-top: 8px; }
+
+.content {
+  padding: 0 28px 28px;
+  display: grid;
+  gap: 20px;
+}
+
+.composer {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  background: rgba(15, 23, 42, 0.28);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 24px;
+  padding: 14px;
+}
+
+.composer input {
+  width: 100%;
+  border: none;
+  outline: none;
+  background: rgba(255,255,255,0.06);
+  color: var(--text);
+  border-radius: 18px;
+  padding: 16px 18px;
+  font-size: 1rem;
+  border: 1px solid rgba(255,255,255,0.10);
+}
+
+.composer input::placeholder { color: #cbd5e1; }
+
+.btn {
+  border: none;
+  outline: none;
+  cursor: pointer;
+  border-radius: 18px;
+  padding: 14px 18px;
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: white;
+  transition: transform 0.15s ease, opacity 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.20);
+}
+
+.btn:hover { transform: translateY(-1px); }
+.btn:active { transform: translateY(0px) scale(0.99); }
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent), #2563eb);
+}
+.btn-danger {
+  background: linear-gradient(135deg, var(--danger), #f97316);
+  padding: 10px 14px;
+  border-radius: 14px;
+  font-size: 0.9rem;
+}
+.btn-ghost {
+  background: rgba(255,255,255,0.08);
+  color: var(--text);
+  border: 1px solid rgba(255,255,255,0.12);
+  box-shadow: none;
+}
+
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.toolbar .hint {
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.list {
+  display: grid;
+  gap: 12px;
+}
+
+.task {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 14px;
+  align-items: center;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 22px;
+  padding: 16px;
+}
+
+.task.completed {
+  opacity: 0.75;
+}
+
+.check {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.45);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  user-select: none;
+  flex: 0 0 auto;
+  transition: all 0.15s ease;
+}
+
+.task.completed .check {
+  background: linear-gradient(135deg, var(--accent-2), #10b981);
+  border-color: transparent;
+}
+
+.task-title {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.task.completed .task-title {
+  text-decoration: line-through;
+  color: #cbd5e1;
+}
+
+.task-meta {
+  color: var(--muted);
+  font-size: 0.84rem;
+  margin-top: 4px;
+}
+
+.empty {
+  text-align: center;
+  padding: 36px 18px;
+  color: var(--muted);
+  border: 1px dashed rgba(255,255,255,0.16);
+  border-radius: 22px;
+  background: rgba(255,255,255,0.05);
+}
+
+.footer {
+  padding: 0 28px 28px;
+}
+
+.readme {
+  margin-top: 8px;
+  padding: 18px;
+  border-radius: 22px;
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.10);
+  color: #e2e8f0;
+  font-size: 0.95rem;
+  line-height: 1.65;
+}
+
+.readme strong { color: white; }
+.readme code {
+  background: rgba(255,255,255,0.12);
+  padding: 2px 7px;
+  border-radius: 8px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 760px) {
+  .app { padding: 12px; }
+  .hero, .content, .footer, .stats { padding-left: 16px; padding-right: 16px; }
+  .stats { grid-template-columns: 1fr; }
+  .composer { grid-template-columns: 1fr; }
+  .task { grid-template-columns: auto 1fr; }
+  .task .actions { grid-column: 1 / -1; display: flex; justify-content: flex-end; }
+  .toolbar { align-items: flex-start; }
+}
+
+  </style>
+</head>
+<body>
+  <div class="bg-orb orb-1"></div>
+  <div class="bg-orb orb-2"></div>
+  <div class="bg-orb orb-3"></div>  <main class="app">
+    <section class="shell" aria-label="Task tracker app">
+      <header class="hero">
+        <span class="badge">✨ Glassmorphism Task Tracker</span>
+        <h1>Stay organized. Look polished.</h1>
+        <p class="subtitle">A modern single-file task manager with local storage, complete/incomplete toggles, delete actions, and a responsive glass UI.</p>
+      </header><section class="stats" aria-label="Task statistics">
+    <div class="stat">
+      <div class="label">Total tasks</div>
+      <div class="value" id="totalCount">0</div>
+    </div>
+    <div class="stat">
+      <div class="label">Active tasks</div>
+      <div class="value" id="activeCount">0</div>
+    </div>
+    <div class="stat">
+      <div class="label">Completed</div>
+      <div class="value" id="doneCount">0</div>
+    </div>
+  </section>
+
+  <section class="content">
+    <form class="composer" id="taskForm" autocomplete="off">
+      <label class="sr-only" for="taskInput">Task name</label>
+      <input id="taskInput" type="text" maxlength="80" placeholder="Type a task and press Add Task..." />
+      <button class="btn btn-primary" type="submit">Add Task</button>
+    </form>
+
+    <div class="toolbar">
+      <div class="hint">Tip: Tap the circle to mark a task complete.</div>
+      <button class="btn btn-ghost" id="clearCompletedBtn" type="button">Clear Completed</button>
+    </div>
+
+    <div class="list" id="taskList" aria-live="polite"></div>
+  </section>
+
+  <footer class="footer">
+    <div class="readme">
+      <strong>README</strong><br />
+      <strong>Project:</strong> Glassmorphism Task Tracker<br />
+      <strong>Features:</strong> Add tasks, complete/incomplete toggle, delete task, localStorage persistence, responsive glassmorphism UI.<br />
+      <strong>Tech:</strong> HTML, CSS, JavaScript only. No external libraries.<br />
+      <strong>How to use:</strong> Open the page, type a task, add it, then tap the circle to complete it or delete it when done.<br />
+      <strong>Deployment:</strong> Host this file as <code>index.html</code> on GitHub Pages.
+    </div>
+  </footer>
+</section>
+
+  </main>  <script>
+    const STORAGE_KEY = 'glass_task_tracker_v1';
+
+    const taskForm = document.getElementById('taskForm');
+    const taskInput = document.getElementById('taskInput');
+    const taskList = document.getElementById('taskList');
+    const clearCompletedBtn = document.getElementById('clearCompletedBtn');
+
+    const totalCount = document.getElementById('totalCount');
+    const activeCount = document.getElementById('activeCount');
+    const doneCount = document.getElementById('doneCount');
+
+    let tasks = loadTasks();
+
+    function loadTasks() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        return saved ? JSON.parse(saved) : [];
+      } catch (error) {
+        console.error('Could not load tasks:', error);
+        return [];
+      }
+    }
+
+    function saveTasks() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+    }
+
+    function addTask(text) {
+      const cleanText = text.trim();
+      if (!cleanText) return;
+
+      tasks.unshift({
+        id: Date.now().toString(36) + Math.random().toString(36).slice(2),
+        text: cleanText,
+        completed: false,
+        createdAt: new Date().toLocaleString()
+      });
+
+      saveTasks();
+      renderTasks();
+    }
+
+    function toggleTask(id) {
+      tasks = tasks.map(task =>
+        task.id === id ? { ...task, completed: !task.completed } : task
+      );
+      saveTasks();
+      renderTasks();
+    }
+
+    function deleteTask(id) {
+      tasks = tasks.filter(task => task.id !== id);
+      saveTasks();
+      renderTasks();
+    }
+
+    function clearCompleted() {
+      tasks = tasks.filter(task => !task.completed);
+      saveTasks();
+      renderTasks();
+    }
+
+    function updateStats() {
+      const total = tasks.length;
+      const completed = tasks.filter(task => task.completed).length;
+      const active = total - completed;
+
+      totalCount.textContent = total;
+      activeCount.textContent = active;
+      doneCount.textContent = completed;
+    }
+
+    function renderTasks() {
+      updateStats();
+
+      if (!tasks.length) {
+        taskList.innerHTML = `
+          <div class="empty">
+            <h3 style="margin:0 0 8px; color:#fff;">No tasks yet</h3>
+            <p style="margin:0;">Add your first task above. Keep it short and useful.</p>
+          </div>
+        `;
+        return;
+      }
+
+      taskList.innerHTML = tasks.map(task => `
+        <article class="task ${task.completed ? 'completed' : ''}">
+          <button class="check" type="button" aria-label="Toggle task" onclick="toggleTask('${task.id}')">
+            ${task.completed ? '✓' : ''}
+          </button>
+
+          <div>
+            <p class="task-title">${escapeHtml(task.text)}</p>
+            <div class="task-meta">Created: ${task.createdAt}</div>
+          </div>
+
+          <div class="actions">
+            <button class="btn btn-danger" type="button" onclick="deleteTask('${task.id}')">Delete</button>
+          </div>
+        </article>
+      `).join('');
+    }
+
+    function escapeHtml(value) {
+      const div = document.createElement('div');
+      div.textContent = value;
+      return div.innerHTML;
+    }
+
+    taskForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      addTask(taskInput.value);
+      taskInput.value = '';
+      taskInput.focus();
+    });
+
+    clearCompletedBtn.addEventListener('click', clearCompleted);
+
+    // Make functions available for inline onclick handlers
+    window.toggleTask = toggleTask;
+    window.deleteTask = deleteTask;
+
+    renderTasks();
+  </script></body>
+</html>
